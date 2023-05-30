@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Validator = void 0;
 const BinaryUtils_1 = require("./BinaryUtils");
 const BinaryUtils_2 = require("./BinaryUtils");
+const IPNumType_1 = require("./IPNumType");
 const IPv6Utils_1 = require("./IPv6Utils");
 const HexadecimalUtils_1 = require("./HexadecimalUtils");
 const HexadecimalUtils_2 = require("./HexadecimalUtils");
@@ -140,11 +141,11 @@ class Validator {
      * @returns {(boolean|string)[]} a tuple representing if valid or not and corresponding message
      */
     static isValidPrefixValue(prefixValue, ipNumType) {
-        if ("IPv4" /* IPv4 */ === ipNumType) {
+        if (IPNumType_1.IPNumType.IPv4 === ipNumType) {
             let withinRange = Validator.isWithinRange(BigInt(prefixValue), 0n, 32n);
             return [withinRange, withinRange ? [] : [Validator.invalidPrefixValueMessage]];
         }
-        if ("IPv6" /* IPv6 */ === ipNumType) {
+        if (IPNumType_1.IPNumType.IPv6 === ipNumType) {
             let withinRange = Validator.isWithinRange(BigInt(prefixValue), 0n, 128n);
             return [withinRange, withinRange ? [] : [Validator.invalidPrefixValueMessage]];
         }
@@ -193,7 +194,7 @@ class Validator {
             return [false, [Validator.invalidIPv4CidrNotationMessage]];
         }
         let [validIpv4, invalidIpv4Message] = Validator.isValidIPv4String(ip);
-        let [validPrefix, invalidPrefixMessage] = Validator.isValidPrefixValue(BigInt(range), "IPv4" /* IPv4 */);
+        let [validPrefix, invalidPrefixMessage] = Validator.isValidPrefixValue(BigInt(range), IPNumType_1.IPNumType.IPv4);
         let isValid = validIpv4 && validPrefix;
         let invalidMessage = invalidIpv4Message.concat(invalidPrefixMessage);
         return isValid ? [isValid, []] : [isValid, invalidMessage];
@@ -208,7 +209,7 @@ class Validator {
      * value contains [] or an array of error message when invalid
      */
     static isValidIPv4CidrRange(ipv4CidrNotation) {
-        return Validator.isValidCidrRange(ipv4CidrNotation, Validator.isValidIPv4CidrNotation, BinaryUtils_1.dottedDecimalNotationToBinaryString, (value) => BinaryUtils_2.cidrPrefixToMaskBinaryString(value, "IPv4" /* IPv4 */));
+        return Validator.isValidCidrRange(ipv4CidrNotation, Validator.isValidIPv4CidrNotation, BinaryUtils_1.dottedDecimalNotationToBinaryString, (value) => BinaryUtils_2.cidrPrefixToMaskBinaryString(value, IPNumType_1.IPNumType.IPv4));
     }
     /**
      *  Checks if the given string is a valid IPv6 range in Cidr notation, with the ip number in the cidr notation
@@ -220,7 +221,7 @@ class Validator {
      * value contains [] or an array of error message when invalid
      */
     static isValidIPv6CidrRange(ipv6CidrNotation) {
-        return Validator.isValidCidrRange(ipv6CidrNotation, Validator.isValidIPv6CidrNotation, HexadecimalUtils_1.colonHexadecimalNotationToBinaryString, (value) => BinaryUtils_2.cidrPrefixToMaskBinaryString(value, "IPv6" /* IPv6 */));
+        return Validator.isValidCidrRange(ipv6CidrNotation, Validator.isValidIPv6CidrNotation, HexadecimalUtils_1.colonHexadecimalNotationToBinaryString, (value) => BinaryUtils_2.cidrPrefixToMaskBinaryString(value, IPNumType_1.IPNumType.IPv6));
     }
     static isValidCidrRange(rangeString, cidrNotationValidator, toBinaryStringConverter, prefixFactory) {
         let validationResult = cidrNotationValidator(rangeString);

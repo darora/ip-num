@@ -6,6 +6,7 @@ const Validator_1 = require("./Validator");
 const BinaryUtils_1 = require("./BinaryUtils");
 const BinaryUtils_2 = require("./BinaryUtils");
 const BinaryUtils_3 = require("./BinaryUtils");
+const IPNumType_1 = require("./IPNumType");
 const BinaryUtils_4 = require("./BinaryUtils");
 const Hexadecatet_1 = require("./Hexadecatet");
 const HexadecimalUtils_1 = require("./HexadecimalUtils");
@@ -122,7 +123,7 @@ class IPv4 extends AbstractIPNum {
          * The type of IP number. Value is one of the values of the {@link IPNumType} enum
          * @type {IPNumType} the type of IP number
          */
-        this.type = "IPv4" /* IPv4 */;
+        this.type = IPNumType_1.IPNumType.IPv4;
         /**
          * An array of {@link Octet}'s
          *
@@ -294,7 +295,7 @@ class Asn extends AbstractIPNum {
          * The maximum bit size (i.e. binary value) of the ASN number in BigInt
          */
         this.maximumBitSize = Validator_1.Validator.THIRTY_TWO_BIT_SIZE;
-        this.type = "ASN" /* ASN */;
+        this.type = IPNumType_1.IPNumType.ASN;
         if (typeof rawValue === 'string') {
             if (Asn.startWithASPrefix(rawValue)) {
                 this.value = BigInt(parseInt(rawValue.substring(2)));
@@ -479,7 +480,7 @@ class IPv6 extends AbstractIPNum {
          * The type of IP number. Value is one of the values of the {@link IPNumType} enum
          * @type {IPNumType} the type of IP number
          */
-        this.type = "IPv6" /* IPv6 */;
+        this.type = IPNumType_1.IPNumType.IPv6;
         /**
          * An array of {@link Hexadecatet}'s
          *
@@ -690,7 +691,7 @@ exports.IPv4Mask = IPv4Mask;
 /**
  * The IPv6Mask can be seen as a specialized IPv4 number where, in a 128 bit number, starting from the left,
  * you have continuous bits turned on (with 1 value) followed by bits turned off (with 0 value). In networking, it
- * is used to to demarcate which bits are used to identify a network, and the ones that are used to identify hosts
+ * is used to demarcate which bits are used to identify a network, and the ones that are used to identify hosts
  * on the network
  */
 class IPv6Mask extends IPv6 {
@@ -710,18 +711,19 @@ class IPv6Mask extends IPv6 {
         this.hexadecatet = [];
         let isValid;
         let message;
-        [isValid, message] = Validator_1.Validator.isValidIPv6Mask(ipString);
+        let expandedIPv6 = IPv6Utils_1.expandIPv6Number(ipString);
+        [isValid, message] = Validator_1.Validator.isValidIPv6Mask(expandedIPv6);
         if (!isValid) {
             throw new Error(message.filter(msg => { return msg !== ''; }).toString());
         }
-        let stringHexadecimals = ipString.split(":");
+        let stringHexadecimals = expandedIPv6.split(":");
         this.hexadecatet = stringHexadecimals.map((stringHexadecatet) => {
             return Hexadecatet_1.Hexadecatet.fromString(stringHexadecatet);
         });
-        let binaryString = HexadecimalUtils_2.hexadectetNotationToBinaryString(ipString);
+        let binaryString = HexadecimalUtils_2.hexadectetNotationToBinaryString(expandedIPv6);
         this.prefix = (binaryString.match(/1/g) || []).length;
         this.value = BigInt(`0b${binaryString}`);
-        this.value = BigInt(`0b${HexadecimalUtils_2.hexadectetNotationToBinaryString(ipString)}`);
+        this.value = BigInt(`0b${HexadecimalUtils_2.hexadectetNotationToBinaryString(expandedIPv6)}`);
     }
     /**
      * A convenience method for creating an instance of IPv6Mask.

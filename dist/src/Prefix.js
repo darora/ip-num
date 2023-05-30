@@ -4,6 +4,7 @@ exports.isIPv4Prefix = exports.IPv6Prefix = exports.IPv4Prefix = void 0;
 const Validator_1 = require("./Validator");
 const IPNumber_1 = require("./IPNumber");
 const BinaryUtils_1 = require("./BinaryUtils");
+const IPNumType_1 = require("./IPNumType");
 const HexadecimalUtils_1 = require("./HexadecimalUtils");
 const Hexadecatet_1 = require("./Hexadecatet");
 /**
@@ -26,7 +27,7 @@ class IPv4Prefix {
         this.bitValue = 32n;
         let isValid;
         let message;
-        [isValid, message] = Validator_1.Validator.isValidPrefixValue(rawValue, "IPv4" /* IPv4 */);
+        [isValid, message] = Validator_1.Validator.isValidPrefixValue(rawValue, IPNumType_1.IPNumType.IPv4);
         if (!isValid) {
             throw new Error(message.filter(msg => { return msg !== ''; }).toString());
         }
@@ -127,7 +128,7 @@ class IPv6Prefix {
         this.bitValue = 128n;
         let isValid;
         let message;
-        [isValid, message] = Validator_1.Validator.isValidPrefixValue(rawValue, "IPv6" /* IPv6 */);
+        [isValid, message] = Validator_1.Validator.isValidPrefixValue(rawValue, IPNumType_1.IPNumType.IPv6);
         if (!isValid) {
             throw new Error(message.filter(msg => { return msg !== ''; }).toString());
         }

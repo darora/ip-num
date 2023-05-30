@@ -5,6 +5,7 @@ const IPNumber_1 = require("./IPNumber");
 const Prefix_1 = require("./Prefix");
 const BinaryUtils_1 = require("./BinaryUtils");
 const Validator_1 = require("./Validator");
+const IPNumType_1 = require("./IPNumType");
 /**
  * Represents a continuous segment of either IPv4 or IPv6 numbers
  * without adhering to classless inter-domain routing scheme
@@ -176,7 +177,11 @@ class RangedSet {
         let otherLast = otherRange.getLast();
         return (thisLast.isGreaterThan(otherFirst) && thisLast.isLessThanOrEquals(otherLast) && thisFirst.isLessThan(otherFirst)
             ||
-                otherLast.isGreaterThan(thisFirst) && otherLast.isLessThanOrEquals(thisLast) && otherFirst.isLessThan(thisFirst));
+                otherLast.isGreaterThan(thisFirst) && otherLast.isLessThanOrEquals(thisLast) && otherFirst.isLessThan(thisFirst)
+            ||
+                this.contains(otherRange)
+            ||
+                otherRange.contains(this));
     }
     /**
      * Check if this range can be converted to a CIDR range.
@@ -187,7 +192,7 @@ class RangedSet {
         }
         try {
             let prefix = BinaryUtils_1.intLog2(this.getSize());
-            let netmask = BinaryUtils_1.parseBinaryStringToBigInt(BinaryUtils_1.cidrPrefixToMaskBinaryString(prefix, IPNumber_1.isIPv4(this.currentValue) ? "IPv4" /* IPv4 */ : "IPv6" /* IPv6 */));
+            let netmask = BinaryUtils_1.parseBinaryStringToBigInt(BinaryUtils_1.cidrPrefixToMaskBinaryString(prefix, IPNumber_1.isIPv4(this.currentValue) ? IPNumType_1.IPNumType.IPv4 : IPNumType_1.IPNumType.IPv6));
             return (this.first.getValue()) === (netmask & (this.first.getValue()));
         }
         catch (e) {
@@ -232,6 +237,12 @@ class RangedSet {
         if (this.isEquals(otherRange)) {
             return new RangedSet(otherRange.getFirst(), otherRange.getLast());
         }
+        if (this.contains(otherRange)) {
+            return new RangedSet(this.getFirst(), this.getLast());
+        }
+        else if (otherRange.contains(this)) {
+            return new RangedSet(otherRange.getFirst(), otherRange.getLast());
+        }
         if (this.isOverlapping(otherRange)) {
             if (this.getFirst().isLessThan(otherRange.getFirst())) {
                 return new RangedSet(this.getFirst(), otherRange.getLast());
@@ -239,12 +250,6 @@ class RangedSet {
             else {
                 return new RangedSet(otherRange.getFirst(), this.getLast());
             }
-        }
-        if (this.contains(otherRange)) {
-            return new RangedSet(this.getFirst(), this.getLast());
-        }
-        else if (otherRange.contains(this)) {
-            return new RangedSet(otherRange.getFirst(), otherRange.getLast());
         }
         throw new Error("Ranges do not overlap nor are equal");
     }

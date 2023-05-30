@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.matchingBitCount = exports.intLog2 = exports.cidrPrefixToMaskBinaryString = exports.leftPadWithZeroBit = exports.dottedDecimalNotationToBinaryString = exports.parseBinaryStringToBigInt = exports.decimalNumberToOctetString = exports.numberToBinaryString = void 0;
+const IPNumType_1 = require("./IPNumType");
 /**
  * Converts a decimal number to binary string
  *
@@ -67,7 +68,7 @@ exports.leftPadWithZeroBit = (binaryString, finalStringLength) => {
  */
 exports.cidrPrefixToMaskBinaryString = (cidrPrefix, ipType) => {
     let cidrUpperValue;
-    if (ipType == "IPv4" /* IPv4 */) {
+    if (ipType == IPNumType_1.IPNumType.IPv4) {
         cidrUpperValue = 32;
     }
     else {
